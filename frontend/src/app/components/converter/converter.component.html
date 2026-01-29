@@ -1,0 +1,87 @@
+<mat-card class="converter-card">
+  <div class="header">
+    <div>
+      <h1>Currency Converter</h1>
+      <p>Use historical exchange rates to convert any supported currency.</p>
+    </div>
+    <div *ngIf="loadingCurrencies" class="loader">
+      <mat-progress-spinner diameter="32" mode="indeterminate"></mat-progress-spinner>
+    </div>
+  </div>
+
+  <form [formGroup]="form" (ngSubmit)="convert()" class="converter-form">
+    <mat-form-field appearance="outline">
+      <mat-label>Amount</mat-label>
+      <input
+        matInput
+        type="number"
+        formControlName="amount"
+        min="0"
+        step="0.01"
+        appAutoFocus
+        [disabled]="loadingCurrencies"
+      />
+      <mat-error *ngIf="form.get('amount')?.invalid">Enter a valid amount</mat-error>
+    </mat-form-field>
+
+    <div class="currency-row">
+      <mat-form-field appearance="outline">
+        <mat-label>From</mat-label>
+        <mat-select formControlName="base" [disabled]="loadingCurrencies">
+          <mat-option
+            *ngFor="let currency of currencies; trackBy: trackByCode"
+            [value]="currency.code"
+          >
+            {{ currency.code }} — {{ currency.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>To</mat-label>
+        <mat-select formControlName="target" [disabled]="loadingCurrencies">
+          <mat-option
+            *ngFor="let currency of currencies; trackBy: trackByCode"
+            [value]="currency.code"
+          >
+            {{ currency.code }} — {{ currency.name }}
+          </mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <mat-form-field appearance="outline">
+      <mat-label>Historical date</mat-label>
+      <input
+        matInput
+        [matDatepicker]="picker"
+        formControlName="date"
+        [disabled]="loadingCurrencies"
+        [max]="maxDate"
+      />
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+    </mat-form-field>
+
+    <button mat-flat-button color="primary" type="submit" [disabled]="converting || loadingCurrencies">
+      <span *ngIf="!converting">Convert</span>
+      <mat-progress-spinner
+        *ngIf="converting"
+        diameter="20"
+        mode="indeterminate"
+      ></mat-progress-spinner>
+    </button>
+
+    <p class="error" *ngIf="errorMessage">{{ errorMessage }}</p>
+  </form>
+
+  <div class="result" *ngIf="result">
+    <div class="result-label">Converted amount</div>
+    <div class="result-value">
+      {{ result.result | number : '1.2-4' }} {{ result.target }}
+    </div>
+    <div class="result-meta">
+      Rate: {{ result.rate | number : '1.4-6' }} on {{ result.date }}
+    </div>
+  </div>
+</mat-card>

@@ -1,0 +1,38 @@
+<mat-card class="history-card">
+  <div class="history-header">
+    <div>
+      <h2>Conversion History</h2>
+      <p>Stored locally on this device.</p>
+    </div>
+    <button
+      mat-stroked-button
+      color="primary"
+      type="button"
+      (click)="clearHistory()"
+    >
+      Clear
+    </button>
+  </div>
+
+  <ng-container *ngIf="history$ | async as history">
+    <div class="empty" *ngIf="history.length === 0">
+      No conversions yet. Convert a currency to get started.
+    </div>
+
+    <div class="history-list" *ngIf="history.length > 0">
+      <div class="history-item" *ngFor="let item of history; trackBy: trackById">
+        <div class="row">
+          <span class="amount">{{ item.amount | number : '1.2-2' }}</span>
+          <span class="code">{{ item.base }}</span>
+          <span class="arrow">→</span>
+          <span class="amount">{{ item.result | number : '1.2-2' }}</span>
+          <span class="code">{{ item.target }}</span>
+        </div>
+        <div class="meta">
+          {{ item.date }} · {{ item.timestamp | date : 'medium' }}
+        </div>
+        <mat-divider></mat-divider>
+      </div>
+    </div>
+  </ng-container>
+</mat-card>
